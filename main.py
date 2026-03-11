@@ -5,6 +5,7 @@ from embeddings.embedder import Embedder
 from vector_store.faiss_store import FAISSStore
 from ingestion.pdf_extractor import PDFExtractor
 from ingestion.audio_extractor import AudioExtractor
+from ingestion.video_extractor import VideoExtractor
 
 EXTRACTOR_REGISTRY = {
     "png": ImageExtractor(),
@@ -13,10 +14,12 @@ EXTRACTOR_REGISTRY = {
     "pdf": PDFExtractor(),
     "mp3": AudioExtractor(),
     "wav": AudioExtractor(),
+    "mp4": VideoExtractor(),
+    "mov": VideoExtractor(),
 }
 
 async def main():
-    file_path = "test.wav"
+    file_path = "test.mp4"
     ext = file_path.split(".")[-1].lower()
 
     extractor = EXTRACTOR_REGISTRY.get(ext)
@@ -30,7 +33,7 @@ async def main():
     store.add_chunks(chunks)
     store.save()
 
-    results = store.search("give something from page 1")
+    results = store.search("how to cut apples")
     for r in results:
         print(r.page_content)
         print(r.metadata)

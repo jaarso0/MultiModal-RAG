@@ -1,24 +1,31 @@
-# Virtual environment
-venv/
-
-# Environment variables - NEVER push this
-.env
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-
-# FAISS index - too large for git
-faiss_index/
-
 # Test files
 test.pdf
 test.png
 test.wav
+test.mp4
+test_temp_audio.wav
+
+# FAISS index
+faiss_index/
+
+# Temp files
+temp_page_*.png
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+
+# Environment
+.env
 
 # VS Code
 .vscode/
 
-# Temp files created during PDF processing
-temp_page_*.png
+# OS
+.DS_Store
+Thumbs.db

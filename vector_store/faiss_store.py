@@ -31,8 +31,6 @@ class FAISSStore:
             allow_dangerous_deserialzation = True
         )
 
-
-
 #FAISS is a vector storage and seo that cant read text on its own 
 #so it needs an embedding model handed to it. apan huggingface model Embedder class me wrap kardiye and passing to faiss
 #faiss uses the hugging face model to internallt convert both docs and queries into vectors whenever needed
