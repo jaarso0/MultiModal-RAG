@@ -15,19 +15,19 @@ GET  /health  →  check server status
 
 ## Architecture
 
-RAW File 
-    ↓
-Modality-Specific Extractor  (pluggable, extend with BaseExtractor)
-    ↓
-Chunker+Normalizer (consistent, metadata enriched JSON)
-    ↓
-HuggingFace Embedder (swappable embedding model)
-    ↓
-FAISS vector store
-    ↓
-LLM chain
-    ↓
-Answer + Sources
+RAW File  
+    ↓  
+Modality-Specific Extractor  (pluggable, extend with BaseExtractor)  
+    ↓  
+Chunker+Normalizer (consistent, metadata enriched JSON)  
+    ↓  
+HuggingFace Embedder (swappable embedding model)  
+    ↓  
+FAISS vector store  
+    ↓  
+LLM chain  
+    ↓  
+Answer + Sources  
 
 ---
 
