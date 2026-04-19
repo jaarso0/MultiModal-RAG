@@ -36,8 +36,7 @@ Answer + Sources
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/rag-framework.git
-
+git clone https://github.com/jaarso0/MultiModal-RAG
 or 
 
 # pip install git+https://github.com/jaarso0/MultiModal-RAG
