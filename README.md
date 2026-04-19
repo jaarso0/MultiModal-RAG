@@ -15,19 +15,19 @@ GET  /health  →  check server status
 
 ## Architecture
 
-RAW File 
-    ↓
-Modality-Specific Extractor  (pluggable, extend with BaseExtractor)
-    ↓
-Chunker+Normalizer (consistent, metadata enriched JSON)
-    ↓
-HuggingFace Embedder (swappable embedding model)
-    ↓
-FAISS vector store
-    ↓
-LLM chain
-    ↓
-Answer + Sources
+RAW File  
+    ↓  
+Modality-Specific Extractor  (pluggable, extend with BaseExtractor)  
+    ↓  
+Chunker+Normalizer (consistent, metadata enriched JSON)  
+    ↓  
+HuggingFace Embedder (swappable embedding model)  
+    ↓  
+FAISS vector store  
+    ↓  
+LLM chain  
+    ↓  
+Answer + Sources  
 
 ---
 
@@ -61,11 +61,11 @@ pip install -r requirements.txt
 
 ### 4. Install system dependencies
 
-| Tool | Purpose | Download |
-|---|---|---|
-| Tesseract | OCR for images and scanned PDFs | [UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki) |
-| Poppler | PDF to image conversion | [poppler-windows](https://github.com/oschwartz10612/poppler-windows/releases) |
-| FFmpeg | Audio/video processing | [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) |
+| Tool | Purpose | Download |  
+|---|---|---|  
+| Tesseract | OCR for images and scanned PDFs | [UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki) |  
+| Poppler | PDF to image conversion | [poppler-windows](https://github.com/oschwartz10612/poppler-windows/releases) |  
+| FFmpeg | Audio/video processing | [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) |  
 
 ### 5. Configure environment
 
@@ -158,30 +158,30 @@ class MyExtractor(BaseExtractor):
 
 ## Project Structure
 
-rag-framework/
-├── ingestion/
-│   ├── base.py              # Abstract base extractor
-│   ├── image_extractor.py   # OCR for images
-│   ├── pdf_extractor.py     # Native + scanned PDF
-│   ├── audio_extractor.py   # Whisper STT
-│   └── video_extractor.py   # Florence-2 + Whisper
-├── processing/
-│   └── chunker.py           # Text splitting + metadata
-├── embeddings/
-│   └── embedder.py          # HuggingFace embeddings
-├── vector_store/
-│   └── faiss_store.py       # FAISS wrapper
-├── llm/
-│   └── chain.py             # LLM-agnostic RAG chain
-├── api/
-│   └── endpoints.py         # FastAPI routes
-├── storage/
-│   └── object_store.py      # Local + S3 abstraction
-├── config.py                # Centralized config
-├── main_api.py              # FastAPI entry point
-├── demo.py                  # Full pipeline demo
-├── .env.example             # Configuration template
-└── requirements.txt
+rag-framework/  
+├── ingestion/  
+│   ├── base.py                          # Abstract base extractor  
+│   ├── image_extractor.py               # OCR for images  
+│   ├── pdf_extractor.py                 # Native + scanned PDF  
+│   ├── audio_extractor.py               # Whisper STT  
+│   └── video_extractor.py               # Florence-2 + Whisper  
+├── processing/  
+│   └── chunker.py                       # Text splitting + metadata  
+├── embeddings/  
+│   └── embedder.py                      # HuggingFace embeddings  
+├── vector_store/  
+│   └── faiss_store.py                   # FAISS wrapper  
+├── llm/  
+│   └── chain.py                         # LLM-agnostic RAG chain  
+├── api/  
+│   └── endpoints.py                     # FastAPI routes  
+├── storage/  
+│   └── object_store.py                  # Local + S3 abstraction  
+├── config.py                            # Centralized config  
+├── main_api.py                          # FastAPI entry point  
+├── demo.py                              # Full pipeline demo  
+├── .env.example                         # Configuration template  
+└── requirements.txt  
 
 
 ## Contributing
