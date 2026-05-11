@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from api.endpoints import router
+import os
 
 app= FastAPI(
     title="Multimodal RAG Framework API",
@@ -15,10 +17,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def serve_index():
+    return FileResponse("index.html")
+
 app.include_router(router)
+
 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main_api:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main_api:app", host="127.0.0.1", port=8000, reload=True)
 

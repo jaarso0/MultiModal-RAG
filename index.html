@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimodal RAG Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .chat-container { height: 500px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-900">
+
+    <div class="max-w-5xl mx-auto p-6">
+        <header class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-indigo-700">Multimodal RAG</h1>
+                <p class="text-slate-500">Upload documents, images, or media to chat with your data.</p>
+            </div>
+            <div id="status-badge" class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                System Active
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Sidebar: Upload and Sources -->
+            <div class="space-y-6">
+                <!-- Upload Section -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-semibold mb-4">Ingest Data</h2>
+                    <form id="upload-form" class="space-y-4">
+                        <input type="file" id="file-input" 
+                               class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer" />
+                        <button type="submit" id="upload-btn" class="w-full bg-indigo-600 text-white py-2 rounded-md font-medium hover:bg-indigo-700 transition">
+                            Upload & Process
+                        </button>
+                    </form>
+                    <div id="upload-status" class="mt-3 text-sm hidden"></div>
+                </div>
+
+                <!-- Sources Section -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold">Knowledge Base</h2>
+                        <button onclick="updateSources()" class="text-indigo-600 hover:rotate-180 transition-transform duration-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                    </div>
+                    <ul id="source-list" class="text-sm space-y-2 text-slate-600 max-h-48 overflow-y-auto custom-scrollbar">
+                        <!-- Sources injected here -->
+                        <li class="italic">No files ingested yet.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main: Chat Interface -->
+            <div class="md:col-span-2 flex flex-col bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div id="chat-window" class="chat-container p-6 overflow-y-auto custom-scrollbar flex flex-col space-y-4 bg-slate-50/50">
+                    <!-- Messages appear here -->
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-100 max-w-[80%] self-start">
+                        <p class="text-sm">Hello! Upload a file and ask me anything about the content.</p>
+                    </div>
+                </div>
+
+                <div class="p-4 border-t border-slate-200 bg-white">
+                    <form id="chat-form" class="flex gap-2">
+                        <input type="text" id="user-input" placeholder="Ask a question about your files..." 
+                               class="flex-1 border border-slate-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md font-medium hover:bg-indigo-700 transition">
+                            Send
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const chatWindow = document.getElementById('chat-window');
+        const chatForm = document.getElementById('chat-form');
+        const uploadForm = document.getElementById('upload-form');
+        const sourceList = document.getElementById('source-list');
+
+        // Helper: Add message to UI
+        function addMessage(text, role = 'user', sources = []) {
+            const wrapper = document.createElement('div');
+            wrapper.className = role === 'user' ? 'max-w-[80%] self-end bg-indigo-600 text-white p-4 rounded-lg shadow-sm' : 'max-w-[80%] self-start bg-white p-4 rounded-lg shadow-sm border border-slate-100';
+            
+            let html = `<p class="text-sm">${text}</p>`;
+            if (sources.length > 0) {
+                html += `<div class="mt-3 pt-2 border-t border-slate-100 text-[10px] text-slate-400">
+                            <strong>Sources:</strong> ${sources.map(s => s.metadata.source || 'Unknown').join(', ')}
+                         </div>`;
+            }
+            
+            wrapper.innerHTML = html;
+            chatWindow.appendChild(wrapper);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // Ingest File
+        uploadForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('file-input');
+            const status = document.getElementById('upload-status');
+            const btn = document.getElementById('upload-btn');
+
+            if (!fileInput.files[0]) return;
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+            status.classList.remove('hidden', 'text-red-500', 'text-green-500');
+            status.innerText = "Uploading...";
+
+            try {
+                const response = await fetch('/ingest', { method: 'POST', body: formData });
+                const result = await response.json();
+                
+                if (response.ok) {
+                    status.classList.add('text-green-500');
+                    status.innerText = `Success: Added ${result.chunks_added} chunks!`;
+                    updateSources();
+                    fileInput.value = '';
+                } else {
+                    throw new Error(result.detail || "Upload failed");
+                }
+            } catch (err) {
+                status.classList.add('text-red-500');
+                status.innerText = err.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Upload & Process";
+            }
+        };
+
+        // Query Chain
+        chatForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('user-input');
+            const question = input.value;
+            if (!question) return;
+
+            addMessage(question, 'user');
+            input.value = '';
+
+            try {
+                const response = await fetch('/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: question, k: 5 })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    addMessage(data.answer, 'bot', data.sources);
+                } else {
+                    addMessage("Error: " + data.detail, 'bot');
+                }
+            } catch (err) {
+                addMessage("Error connecting to server.", 'bot');
+            }
+        };
+
+        // Update Sources List
+        async function updateSources() {
+            try {
+                const response = await fetch('/sources');
+                const data = await response.json();
+                if (data.ingested_files.length > 0) {
+                    sourceList.innerHTML = data.ingested_files
+                        .map(src => `<li class="flex items-center gap-2">
+                            <span class="w-2 h-2 bg-indigo-400 rounded-full"></span>
+                            <span class="truncate" title="${src}">${src.split('/').pop()}</span>
+                        </li>`).join('');
+                }
+            } catch (err) {
+                console.error("Failed to fetch sources");
+            }
+        }
+
+        // Initial check
+        updateSources();
+    </script>
+</body>
+</html>

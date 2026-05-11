@@ -28,7 +28,7 @@ class FAISSStore:
         self.store = FAISS.load_local(
             path, 
             self.embedder,
-            allow_dangerous_deserialzation = True
+            allow_dangerous_deserialization = True
         )
 
 #FAISS is a vector storage and seo that cant read text on its own 

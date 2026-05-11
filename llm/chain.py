@@ -7,7 +7,7 @@ from config import GEMINI_API_KEY_LLM, GEMINI_MODEL
 def build_chain(vector_store):
     llm = ChatGoogleGenerativeAI(
         model=GEMINI_MODEL,
-        google_api_key=GEMINI_API_KEY_LLM,
+        google_api_key=GEMINI_API_KEY_LLM, 
         temperature=0
     )
 
@@ -43,4 +43,4 @@ def build_chain(vector_store):
         | StrOutputParser()
     )
 
-    return chain, retriever
+    return chain, retriever         
